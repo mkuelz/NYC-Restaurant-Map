@@ -195,19 +195,6 @@ var CODES = {
 "22C": "Bulb not shielded or shatterproof, in areas where there is extreme heat, temperature changes, or where accidental contact may occur.",
 "22E": "ROP processing equipment not approved by DOHMH."}
 
-var filterText = '';
-var filteredData = [];
-var timerId;	
-
-L.Marker.extend({
-	options: { 
-	CAMIS: '',
-	DBA: '',
-	LATITUDE: '',
-	LONGITUDE: '',
-	GRADES: ''
-	}
-});
 
 function frmsubmit(){
 	const request = new XMLHttpRequest();
@@ -225,7 +212,7 @@ function frmsubmit(){
 				drawMarkers();
 		}
 	};
-		// Add data to send with request
+
 	const data = new FormData();
 	data.append('filterOn', letters);
 
@@ -299,9 +286,9 @@ function getPie(e){
 		else {
 			day2 = new Date(grades[i-1]['DATE']);
 		}
-		let day1 = new Date(grades[i]['DATE'])
-		let diffTime = Math.abs(day2 - day1);
-		let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+		var day1 = new Date(grades[i]['DATE'])
+		var diffTime = Math.abs(day2 - day1);
+		var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 		
 		if (data[grades[i].GRADE]) {
 			data[grades[i].GRADE] = data[grades[i].GRADE] + diffDays
@@ -371,15 +358,13 @@ function clickTable(e) {
 	
 
 function throttleFunction(func, delay) {
-	// If setTimeout is already scheduled, no need to do anything
+
 	if (timerId) {
 		return
 	}
 	// Schedule a setTimeout after delay seconds
 	timerId  =  setTimeout(function () {
 		func()
-		// Once setTimeout function execution is finished, timerId = undefined so that in <br>
-		// the next scroll event function execution can be scheduled by the setTimeout
 		timerId  =  undefined;
 	}, delay)
 }
@@ -399,11 +384,6 @@ function drawMarkers(){
 	d.Longitude = +d.Longitude;
 	
 	if (mymap.getBounds().contains([d.Latitude,d.Longitude])) {
-	
-	//if (d['GRADE HISTORY'][0]['GRADE'] === "A") {
-	//	varIcon = greenIcon
-	//	}
-	//else {varIcon = redIcon}
 		d.MARKER.addTo(layerGroup)
 	}
 	});
@@ -436,16 +416,16 @@ function drawTable(){
 	
 	var table = d3.select("tbody")
 	var tr = table.selectAll("tr").data(filteredData)
-	var rowExit = tr.exit().remove();
-	var rowEnter = tr.enter().append('tr');
-		tr = rowEnter.merge(tr).on('click',clickTable)
+	var trExit = tr.exit().remove();
+	var trEnter = tr.enter().append('tr');
+		tr = trEnter.merge(tr).on('click',clickTable)
 		
 	var td = tr.selectAll("td")
 	.data(function(d) {return [{column:'DBA', value: d.DBA}, {column:'GRADE', value: d['GRADE HISTORY'][0]['GRADE']},{column:'GRADEDATE', value: d['GRADE HISTORY'][0]['DATE']},{column:'LOCATION', value: d["BUILDING"] + " " + d["STREET"] + "," + d["BORO"]}]});
 			
-	var cellExit = td.exit().remove();
-	var cellEnter = td.enter().append("td");
-		td = cellEnter.merge(td).text(d => d.value)
+	var tdExit = td.exit().remove();
+	var tdEnter = td.enter().append("td");
+		td = tdEnter.merge(td).text(d => d.value)
 };
 
 
@@ -463,19 +443,19 @@ function drawInspections(d){
 					
 	var table = inspectionDiv.append("table").attr("class","table table-sm").append("tbody")	
 
-	var tableRow = table.selectAll("tr").data(d.CODES)
-	var rowExit = tableRow.exit().remove();
-	var rowEnter = tableRow.enter().append('tr');
-		tableRow = rowEnter.merge(tableRow)
+	var tr = table.selectAll("tr").data(d.CODES)
+	var trExit = tr.exit().remove();
+	var trEnter = tr.enter().append('tr');
+		tr = trEnter.merge(tr)
 
-	var td = tableRow.selectAll("td")
+	var td = tr.selectAll("td")
 		.data(function(d,i) {
 		return [{column:'CODE', value: CODES[d['violation_code']]}]
 		});
 			
-	var cellExit = td.exit().remove();
-	var cellEnter = td.enter().append("td");
-		td = cellEnter.merge(td).text(d => d.value)
+	var tdExit = td.exit().remove();
+	var tdEnter = td.enter().append("td");
+		td = tdEnter.merge(td).text(d => d.value)
 	
 };
 
@@ -586,8 +566,19 @@ function getLineChart(e){
 	return svg.node();
 }
 
+L.Marker.extend({
+	options: { 
+	CAMIS: '',
+	DBA: '',
+	LATITUDE: '',
+	LONGITUDE: '',
+	GRADES: ''
+	}
+});
 
-
+var filterText = '';
+var filteredData = [];
+var timerId;	
 var layerGroup = L.layerGroup()
 var basetiles = L.tileLayer(
 	'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
@@ -604,7 +595,6 @@ d3.select('#filterOn').on('keyup', filtered);
 
 	
 </script>
-
 
 </html>
 

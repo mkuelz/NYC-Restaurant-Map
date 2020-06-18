@@ -14,12 +14,14 @@ def home():
 @app.route("/filter", methods=["POST"])
 def refresh():
 
-	filterText = request.form.get("filterOn").upper()
+	filterText = request.form.get("filterOn").upper().strip()
+	print(filterText)
 	client = Socrata("data.cityofnewyork.us",config.access_token)
 	results = client.get("43nn-pn8j", 
 					select="dba, camis,latitude,longitude,building,street,boro,inspection_date,violation_code,coalesce(grade,''),coalesce(score,-1) as score",
-					where="dba like '%" + filterText + "%' AND coalesce(latitude,0) != 0 AND coalesce(longitude,0) != 0 and coalesce(violation_code,'') != '' ",
-					order="camis,inspection_date DESC ,violation_code ASC")
+					where="upper(dba) like '%" + filterText + "%' AND coalesce(latitude,0) != 0 AND coalesce(longitude,0) != 0 and coalesce(violation_code,'') != '' ",
+					order="camis,inspection_date DESC ,violation_code ASC",
+					limit = 2000)
 
 	groups = []
 	camis = set()
