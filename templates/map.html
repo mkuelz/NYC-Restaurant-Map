@@ -27,7 +27,7 @@
 	#tablediv {overflow-y: auto;  max-height:559px;}
 	#gradeTableDiv {max-height: 200px; overflow-y:auto;padding-left: 0; padding-top: 10px;}
 	
-	.pieLabel {text-anchor: middle; fill: white; font-size: 1.0rem; dy: 1rem}
+	.pieLabel {text-anchor: middle; fill: white; font-size: 1.0rem; dy: 1rem; pointer-events: none}
 	hr {
 		display: block;
 		height: 1px;
@@ -278,7 +278,6 @@ function getPie(e){
 	var radius = Math.min(width, height) / 2;
 	var data = {}
 	var totalDays = 0
-	var percentLabel
 	
 	var grades = e.options.GRADES.filter(function(item) {
 		return item.GRADE != 'Ungraded'});
@@ -334,18 +333,38 @@ function getPie(e){
 		.attr('stroke', 'white')
 		.attr('pointer-events', 'none')
 		.on("mouseover",function(d) {d3.select(this).transition()
-			.duration(100)
+			.duration(200)
 			.ease(d3.easeLinear)
 			.attr('d', d3.arc()
-			.innerRadius(radius-60)
-			.outerRadius(radius*1.1));
+				.innerRadius(radius-60)
+				.outerRadius(radius*1.1))
+
+			let g = d3.select(this).node().parentNode
+			d3.select(g).select(".pieLabel").text((parseFloat((d.data.value/totalDays) * 100).toFixed(1)+"%")).transition().attr("transform", function (d) {
+				let _d = arc.centroid(d)
+				_d[0] = _d[0] * 1.2
+				_d[1] = _d[1] * 1.2
+				
+				return "translate(" + _d + ")";
+			})
+			.duration(200)
 		})
 		.on("mouseout",function() {d3.select(this).transition()
-			.duration(100)
+			.duration(200)
 			.ease(d3.easeLinear)
 			.attr('d', d3.arc()
-			.innerRadius(radius-60)
-			.outerRadius(radius))
+				.innerRadius(radius-60)
+				.outerRadius(radius))
+			
+			let text = d3.select(this).node()
+			let g = text.parentNode
+			d3.select(g).select(".pieLabel").text(function (d) {
+				return d.data.key;
+			})
+			.transition().attr("transform", function (d) {
+				return "translate(" + arc.centroid(d) + ")";
+			})
+			.duration(200)
 		})
 		.transition()
 		.duration(function(d, i) {
@@ -361,11 +380,11 @@ function getPie(e){
 		
 	svg.selectAll(".arc").append("text")
 	.attr("transform", function (d) {
-	return "translate(" + arc.centroid(d) + ")";
+		return "translate(" + arc.centroid(d) + ")";
 	})
 	.attr("class","pieLabel")
 	.text(function (d) {
-	return d.data.key;
+		return d.data.key;
 	})
 
 	return div.node();
