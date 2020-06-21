@@ -26,7 +26,6 @@
 	#filterOn, .input-group-text {height: 36px}
 	#tablediv {overflow-y: auto;  max-height:559px;}
 	#gradeTableDiv {max-height: 200px; overflow-y:auto;padding-left: 0; padding-top: 10px;}
-	#pieDiv {padding-top: 10px;}
 	
 	.pieLabel {text-anchor: middle; fill: white; font-size: 1.0rem; dy: 1rem}
 	hr {
@@ -51,6 +50,11 @@
 		  color:black;
 		  z-index: 1001;
 		
+		}
+		
+	#tooltipDiv{
+		  text-align: center; 
+		  padding: 2px;	
 		}
 		
 	.col-4 {padding-left: 0px; padding-right: 0px}
@@ -198,7 +202,7 @@ var CODES = {
 
 function frmsubmit(){
 	const request = new XMLHttpRequest();
-	const letters = document.querySelector('#filterOn').value;
+	var letters = document.querySelector('#filterOn').value;
 	request.open('POST', '/filter');	
 	request.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
@@ -213,7 +217,7 @@ function frmsubmit(){
 		}
 	};
 
-	const data = new FormData();
+	var data = new FormData();
 	data.append('filterOn', letters);
 
 	request.send(data);
@@ -250,7 +254,6 @@ function getGradeTable(e){
 		thead.append("th").text("Score");	
 	var tbody = tbl.append("tbody").attr("class","table table-sm");
 
-
 	var tr = tbody.selectAll("tr").data(e.options.GRADES)
 	var trExit = tr.exit().remove();
 	var trEnter = tr.enter().append('tr');
@@ -269,14 +272,17 @@ function getGradeTable(e){
 function getPie(e){
 
 	var colors = {"A": "#2ca02c", "B":"#ff7f0e","C":"#d62728","N":"#9467bd", "Z":"#9467bd", "P":"#000000"}
-	var width = 150
+	var width = 150,
 		height = 150
+	var factor = 1.2
 	var radius = Math.min(width, height) / 2;
 	var data = {}
+	var totalDays = 0
+	var percentLabel
 	
 	var grades = e.options.GRADES.filter(function(item) {
 		return item.GRADE != 'Ungraded'});
-		
+	
 	for (var i = grades.length-1; i >= 0; i--)
 	{
 		var day2
@@ -290,6 +296,8 @@ function getPie(e){
 		var diffTime = Math.abs(day2 - day1);
 		var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 		
+			totalDays += diffDays;
+		
 		if (data[grades[i].GRADE]) {
 			data[grades[i].GRADE] = data[grades[i].GRADE] + diffDays
 		} else {
@@ -300,10 +308,10 @@ function getPie(e){
 	var div = d3.create('div')
 
 	var svg = div.append('svg')
-	.attr('width', width)
-	.attr('height', height)
+	.attr('width','200px')
+	.attr('height','200px')
 	.append('g')
-	.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+	.attr('transform', 'translate(' + 100 + ',' + 100 + ')');
 
 	var pie = d3.pie()
 	.sort(null)
@@ -316,11 +324,28 @@ function getPie(e){
 	.innerRadius(radius - 60)
 	.outerRadius(radius);
 
-	var path = svg.selectAll("path")
+	var g = svg.selectAll("path")
 		.data(data_ready)
-		.enter().append("g").attr("class", "arc").append("path")
+		.enter().append("g").attr("class", "arc");
+	var path = g.append("path")
 		.attr("fill", function(d, i) {
 			return colors[d.data.key];
+		})
+		.attr('stroke', 'white')
+		.attr('pointer-events', 'none')
+		.on("mouseover",function(d) {d3.select(this).transition()
+			.duration(100)
+			.ease(d3.easeLinear)
+			.attr('d', d3.arc()
+			.innerRadius(radius-60)
+			.outerRadius(radius*1.1));
+		})
+		.on("mouseout",function() {d3.select(this).transition()
+			.duration(100)
+			.ease(d3.easeLinear)
+			.attr('d', d3.arc()
+			.innerRadius(radius-60)
+			.outerRadius(radius))
 		})
 		.transition()
 		.duration(function(d, i) {
@@ -332,7 +357,8 @@ function getPie(e){
 				d.endAngle = i(t);
 				return arc(d);
 		}})
-
+		.transition().attr('pointer-events', 'auto')
+		
 	svg.selectAll(".arc").append("text")
 	.attr("transform", function (d) {
 	return "translate(" + arc.centroid(d) + ")";
@@ -392,8 +418,9 @@ function drawMarkers(){
 function mapChange()
 	{
 	d3.select("#inspectionDiv").remove();
+	d3.select("#tooltipDiv").remove();
 	
-	  for (var i in layerGroup._layers)
+	for (var i in layerGroup._layers)
 		if (!mymap.getBounds().contains(layerGroup._layers[i]._latlng)) {
 			layerGroup.removeLayer(i);
 		}
@@ -470,7 +497,7 @@ function getLineChart(e){
 		
 	var data = ungraded.map(function(item) {
 			return({x: new Date(item['DATE']),y: +item['SCORE'], CODES: item['CODES']})
-		});
+	});
 			
 	data.sort(function(a,b){
 		return new Date(a.x) - new Date(b.x);
@@ -504,8 +531,15 @@ function getLineChart(e){
 		.attr("cx", function(d) { return x(d.x); })
 		.attr("cy", function(d) { return y(d.y); })
 		.style('fill', 'lightsteelblue')
-		.on("mouseover",drawInspections).on("mouseout", function() {d3.select("#inspectionDiv").remove()})
-
+		.on("mouseover",function(d) {
+			d3.select(this).attr("r",6);
+			drawInspections(d)
+			})
+		.on("mouseout", function() {
+			d3.select(this).attr("r",4);
+			d3.select("#inspectionDiv").remove()
+			})
+		
 	var totalLength = path.node().getTotalLength();
 	
 	path
@@ -587,7 +621,7 @@ var basetiles = L.tileLayer(
 	maxZoom: 17
 	});
 
-var mymap = L.map('mapid', {layers: [basetiles,layerGroup] })
+var mymap = L.map('mapid', {layers: [basetiles,layerGroup]})
 	.setView([40.7128, -74.0060], 14)
 
 mymap.on('resize moveend zoomend', mapMove);
