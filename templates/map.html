@@ -36,6 +36,7 @@
 		margin: 1em 0;
 		padding: 0;
 	}
+	rect {opacity: .15}
 	.leaflet-popup-content-wrapper {text-align: center; height: 260px}
 	.leaflet-popup-content {width: auto !important;}
 	
@@ -48,8 +49,7 @@
 		  border: 0px;		  
 		  border-radius: 8px;
 		  color:black;
-		  z-index: 1001;
-		
+		  z-index: 1001;	
 		}
 		
 	#tooltipDiv{
@@ -529,18 +529,94 @@ function getLineChart(e){
 
 	var x = d3.scaleTime().domain(d3.extent(data, function(d) { return d.x; })).range([0, w]);
 	var y = d3.scaleLinear().domain([0, d3.max(data, function(d) { return d.y; })+5]).range([h, 0]);
-
+		
+	ticks = y.ticks();
+	ticks.push(14)
+	if (d3.max(ticks) > 27) {
+		ticks.push(28)
+	};	
+			
+	var maxPoint =  d3.max(data, function(d) { return d.y; })+5
+	
+	g.append("rect")
+      	.attr("x", 0)
+      	.attr("y",y(14))
+        .attr("width", w)
+        .attr("height", h-y(14))
+        .style("fill", '#2ca02c');
+		
+	if (maxPoint > 14) {
+		g.append("rect")
+      	.attr("x", 0)
+      	.attr("y", y(d3.min([28,maxPoint])))
+        .attr("width", w)
+        .attr("height", y(14)-y(d3.min([28,maxPoint])))
+        .style("fill", '#ff7f0e');
+	};
+		
+	if (maxPoint > 28) {		
+		g.append("rect")
+      	.attr("x", 0)
+      	.attr("y",y(maxPoint))
+        .attr("width", w)
+        .attr("height", y(28)-y(maxPoint))
+        .style("fill", '#d62728')
+	};
+		
 	var line = d3.line()
 		.curve(d3.curveMonotoneY)
 		.x(function(d) {return x(d.x);})
 		.y(function(d) {return y(d.y);})
 
+		
+	g.append("g")
+		.attr("class", "axisBottom")
+		.attr("transform", "translate(" + (0) + " ," + (h) + ")")  
+		.call(d3.axisBottom(x))
+		.selectAll("text")	
+		.style("text-anchor", "end")
+		.attr("dx", "-.8em")
+		.attr("dy", ".15em")
+		.attr("transform", "rotate(-65)");
+
+	g.append("g")
+		.attr("class", "axis")
+		.attr("transform", "translate(0 ,0)")  
+		.call(d3.axisLeft(y)
+		.tickFormat(function(d) {if (d == 0) {return "A"}  else if (d == 14) {return "B"} else if (d == 28) {return "C"} else  {return d}})
+		.tickValues(ticks));
+		
+	var tickB = svg.selectAll("g > text")
+	.filter(function(){ 
+		return d3.select(this).text() == "B"
+	}).attr("color","#ff7f0e");
+	
+	B = tickB.select(function() { return this.parentNode; }); 
+	B.select("line").attr("x2",w).attr("color","#ff7f0e");
+	
+	var tickC = svg.selectAll("g > text")
+	.filter(function(){ 
+		return d3.select(this).text() == "C"
+	}).attr("color","#d62728");
+
+	C = tickC.select(function() { return this.parentNode; }); 
+	C.select("line").attr("x2",w).attr("color","#d62728");
+	
+	svg.selectAll("g > text")
+	.filter(function(){ 
+		return d3.select(this).text() == "A"
+	}).attr("color","#2ca02c");
+	
+	svg.selectAll(".axisBottom > .domain")
+	.style("stroke","#2ca02c");
+
+	
 	var path = g.insert("svg:path")
 		.data([data])
 		.attr("d", line)
 		.attr("stroke", "steelblue")
 		.attr("stroke-width", "2")
-		.attr("fill", "none")
+		.attr("fill", "none");
 		
 	var circles = g.selectAll(null)
 		.data(data)
@@ -553,12 +629,12 @@ function getLineChart(e){
 		.on("mouseover",function(d) {
 			d3.select(this).attr("r",6);
 			drawInspections(d)
-			})
+		})
 		.on("mouseout", function() {
 			d3.select(this).attr("r",4);
 			d3.select("#inspectionDiv").remove()
-			})
-		
+		});
+
 	var totalLength = path.node().getTotalLength();
 	
 	path
@@ -568,53 +644,6 @@ function getLineChart(e){
 		.duration(1000)
 		.ease(d3.easeLinear)
 		.attr("stroke-dashoffset", 0);
-		
-	g.append("g")
-		.attr("class", "axisBottom")
-		.attr("transform", "translate(" + (0) + " ," + (h) + ")")  
-		.call(d3.axisBottom(x))
-		.selectAll("text")	
-		.style("text-anchor", "end")
-		.attr("dx", "-.8em")
-		.attr("dy", ".15em")
-		.attr("transform", "rotate(-65)");
-
-		ticks = y.ticks();
-		ticks.push(14)
-		if (d3.max(ticks) > 27) {
-			ticks.push(28)};
-
-	g.append("g")
-		.attr("class", "axis")
-		.attr("transform", "translate(0 ,0)")  
-		.call(d3.axisLeft(y)
-		.tickFormat(function(d) {if (d == 0) {return "A"}  else if (d == 14) {return "B"} else if (d == 28) {return "C"} else  {return d}})
-		.tickValues(ticks));
-		
-	var tickB = svg.selectAll("g > text")
-	.filter(function(){ 
-		return d3.select(this).text() == "B"
-	}).attr("color","#ff7f0e")
-	
-	g = tickB.select(function() { return this.parentNode; }) 
-	g.select("line").attr("x2",w).attr("color","#ff7f0e")
-	
-	var tickC = svg.selectAll("g > text")
-	.filter(function(){ 
-		return d3.select(this).text() == "C"
-	}).attr("color","#d62728")
-
-	g = tickC.select(function() { return this.parentNode; }) 
-	g.select("line").attr("x2",w).attr("color","#d62728")
-	.attr("fill", "red");
-	
-	svg.selectAll("g > text")
-	.filter(function(){ 
-		return d3.select(this).text() == "A"
-	}).attr("color","#2ca02c") 
-	
-	svg.selectAll(".axisBottom > .domain")
-	.style("stroke","green");
 
 	return svg.node();
 }

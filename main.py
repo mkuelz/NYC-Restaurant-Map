@@ -15,7 +15,7 @@ def home():
 def refresh():
 
 	filterText = request.form.get("filterOn").upper().strip()
-	print(filterText)
+	#print(filterText)
 	client = Socrata("data.cityofnewyork.us",config.access_token)
 	results = client.get("43nn-pn8j", 
 					select="dba, camis,latitude,longitude,building,street,boro,inspection_date,violation_code,coalesce(grade,''),coalesce(score,-1) as score",
