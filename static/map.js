@@ -382,10 +382,10 @@ function drawInspections(d) {
 
     var table = inspections.append("table").attr("class", "table table-sm").append("tbody");
 
-    var tr = table.selectAll("tr").data(d.CODES);
-    var trExit = tr.exit().remove();
-    var trEnter = tr.enter().append('tr');
-    tr = trEnter.merge(tr);
+    var tr = table.selectAll("tr").data(d.CODES)
+    var trExit = tr.exit().remove()
+    var trEnter = tr.enter().append('tr')
+    tr = trEnter.merge(tr)
 
     var td = tr.selectAll("td")
         .data(function (d, i) {
@@ -408,7 +408,7 @@ function getLineChart(e) {
     });
 
     var data = ungraded.map(function (item) {
-        return ({ x: new Date(item['DATE']), y: +item['SCORE'], codes: item['CODES'] });
+        return ({ x: new Date(item['DATE']), y: +item['SCORE'], CODES: item['CODES'] });
     });
 
     data.sort(function (a, b) {
@@ -461,7 +461,6 @@ function getLineChart(e) {
         .x(function (d) { return x(d.x); })
         .y(function (d) { return y(d.y); });
 
-
     g.append("g")
         .attr("class", "axisBottom")
         .attr("transform", "translate(" + (0) + " ," + (h) + ")")
@@ -502,7 +501,6 @@ function getLineChart(e) {
 
     svg.selectAll(".axisBottom > .domain")
         .style("stroke", "#2ca02c");
-
 
     var path = g.insert("svg:path")
         .data([data])
