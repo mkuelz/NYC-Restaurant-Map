@@ -125,12 +125,12 @@ function getPopUp(e) {
         .text(e.options.DBA)
         .attr("text-anchor", "middle");
 
-    var divRow = div.append("div").attr("class", "row") 
+    var divRow = div.append("div").attr("class", "row")
     var divLine = divRow.append("div").attr("class", "col-4")
     divLine.node().appendChild(getLineChart(e));
     var divPie = divRow.append("div").attr("class", "col-4").attr("id", "pieDiv");
     divPie.node().appendChild(getPie(e));
-    var divTable = divRow.append("div").attr("class", "col-4").attr("id", "gradeTableDiv")
+    var divTable = divRow.append("div").attr("class", "col-4").attr("id", "gradeTable")
     divTable.node().appendChild(getGradeTable(e));
 
     return div.node()
@@ -149,7 +149,7 @@ function getGradeTable(e) {
     var tr = tbody.selectAll("tr").data(e.options.GRADES)
     var trExit = tr.exit().remove();
     var trEnter = tr.enter().append('tr');
-    tr = trEnter.merge(tr).on("mouseover", drawInspections).on("mouseout", function () { d3.select("#inspectionDiv").remove() })
+    tr = trEnter.merge(tr).on("mouseover", drawInspections).on("mouseout", function () { d3.select("#inspections").remove() })
 
     var td = tr.selectAll("td")
         .data(function (d) { return [{ column: 'Grade', value: d.GRADE }, { column: 'Date', value: d['DATE'] }, { column: 'Score', value: d.SCORE }] });
@@ -329,7 +329,7 @@ function drawMarkers() {
 }
 
 function mapChange() {
-    d3.select("#inspectionDiv").remove();
+    d3.select("#inspections").remove();
     d3.select("#tooltipDiv").remove();
 
     for (var i in layerGroup._layers)
@@ -374,14 +374,14 @@ function drawInspections(d) {
     var posX = d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().x
     var posY = d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().bottom + 40
 
-    var inspectionDiv = d3.select("body").append("div").attr("id", "inspectionDiv")
+    var inspections = d3.select("body").append("div").attr("id", "inspections")
         .style("left", (posX + 'px'))
         .style("top", (posY + 'px'))
         .style("display", "block")
         .style("max-width", "655px")  //d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().width
         .style("width", "655px");
 
-    var table = inspectionDiv.append("table").attr("class", "table table-sm").append("tbody")
+    var table = inspections.append("table").attr("class", "table table-sm").append("tbody")
 
     var tr = table.selectAll("tr").data(d.CODES)
     var trExit = tr.exit().remove();
@@ -527,7 +527,7 @@ function getLineChart(e) {
         })
         .on("mouseout", function () {
             d3.select(this).attr("r", 4);
-            d3.select("#inspectionDiv").remove()
+            d3.select("#inspections").remove()
         });
 
     var totalLength = path.node().getTotalLength();
