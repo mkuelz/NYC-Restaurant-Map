@@ -1,4 +1,4 @@
-var CODES = {
+const codes = {
     "02A": "Food not cooked to required minimum temperature.",
     "02B": "Hot food item not held at or above 140ºF.",
     "02C": "Hot food item that has been cooked and refrigerated is being held for service without first being reheated to 165ºF or above within 2 hours.",
@@ -89,7 +89,7 @@ var CODES = {
     "22C": "Bulb not shielded or shatterproof, in areas where there is extreme heat, temperature changes, or where accidental contact may occur.",
     "22E": "ROP processing equipment not approved by DOHMH."
 }
-
+const colors = { "A": "#2ca02c", "B": "#ff7f0e", "C": "#d62728", "N": "#9467bd", "Z": "#9467bd", "P": "#000000" }
 
 function frmsubmit() {
     const request = new XMLHttpRequest();
@@ -118,7 +118,7 @@ function frmsubmit() {
 
 function getPopUp(e) {
 
-    var div = d3.create('div').attr("class", "container-fluid").style("width", "615px")
+    var div = d3.create('div').attr("class", "container-fluid")
 
     div.append("text")
         .style("font-size", ".8rem")
@@ -163,7 +163,6 @@ function getGradeTable(e) {
 
 function getPie(e) {
 
-    var colors = { "A": "#2ca02c", "B": "#ff7f0e", "C": "#d62728", "N": "#9467bd", "Z": "#9467bd", "P": "#000000" }
     var width = 150,
         height = 150
     var radius = Math.min(width, height) / 2;
@@ -279,7 +278,7 @@ function getPie(e) {
         .attr("class", "pieLabel")
         .text(function (d) {
             return d.data.key;
-        })
+        });
 
     return div.node();
 }
@@ -330,7 +329,6 @@ function drawMarkers() {
 
 function mapChange() {
     d3.select("#inspections").remove();
-    d3.select("#tooltipDiv").remove();
 
     for (var i in layerGroup._layers)
         if (!mymap.getBounds().contains(layerGroup._layers[i]._latlng)) {
@@ -354,8 +352,8 @@ function filterChange() {
 
 function drawTable() {
 
-    var table = d3.select("tbody")
-    var tr = table.selectAll("tr").data(filteredData)
+    var table = d3.select("tbody");
+    var tr = table.selectAll("tr").data(filteredData);
     var trExit = tr.exit().remove();
     var trEnter = tr.enter().append('tr');
     tr = trEnter.merge(tr).on('click', clickTable)
@@ -365,38 +363,38 @@ function drawTable() {
 
     var tdExit = td.exit().remove();
     var tdEnter = td.enter().append("td");
-    td = tdEnter.merge(td).text(d => d.value)
+    td = tdEnter.merge(td).text(d => d.value);
 };
 
 
 function drawInspections(d) {
 
-    var posX = d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().x
-    var posY = d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().bottom + 40
+    let posX = d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().x;
+    let posY = d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().bottom + 40;
+    let width = d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().width;
 
     var inspections = d3.select("body").append("div").attr("id", "inspections")
         .style("left", (posX + 'px'))
         .style("top", (posY + 'px'))
         .style("display", "block")
-        .style("max-width", "655px")  //d3.select(".leaflet-popup-content-wrapper").node().getBoundingClientRect().width
-        .style("width", "655px");
+        .style("max-width", width + 'px')
+        .style("width", width + 'px');
 
-    var table = inspections.append("table").attr("class", "table table-sm").append("tbody")
+    var table = inspections.append("table").attr("class", "table table-sm").append("tbody");
 
-    var tr = table.selectAll("tr").data(d.CODES)
+    var tr = table.selectAll("tr").data(d.CODES);
     var trExit = tr.exit().remove();
     var trEnter = tr.enter().append('tr');
-    tr = trEnter.merge(tr)
+    tr = trEnter.merge(tr);
 
     var td = tr.selectAll("td")
         .data(function (d, i) {
-            return [{ column: 'CODE', value: CODES[d['violation_code']] }]
+            return [{ column: 'CODE', value: codes[d['violation_code']] }]
         });
 
     var tdExit = td.exit().remove();
     var tdEnter = td.enter().append("td");
-    td = tdEnter.merge(td).text(d => d.value)
-
+    td = tdEnter.merge(td).text(d => d.value);
 };
 
 function getLineChart(e) {
@@ -406,11 +404,11 @@ function getLineChart(e) {
         h = 220 - margin.top - margin.bottom;
 
     var ungraded = e.options.GRADES.filter(function (item) {
-        return item.SCORE != ''
+        return item.SCORE != '';
     });
 
     var data = ungraded.map(function (item) {
-        return ({ x: new Date(item['DATE']), y: +item['SCORE'], CODES: item['CODES'] })
+        return ({ x: new Date(item['DATE']), y: +item['SCORE'], codes: item['CODES'] });
     });
 
     data.sort(function (a, b) {
@@ -426,12 +424,12 @@ function getLineChart(e) {
     var y = d3.scaleLinear().domain([0, d3.max(data, function (d) { return d.y; }) + 5]).range([h, 0]);
 
     ticks = y.ticks();
-    ticks.push(14)
+    ticks.push(14);
     if (d3.max(ticks) > 27) {
-        ticks.push(28)
+        ticks.push(28);
     };
 
-    var maxPoint = d3.max(data, function (d) { return d.y; }) + 5
+    var maxPoint = d3.max(data, function (d) { return d.y; }) + 5;
 
     g.append("rect")
         .attr("x", 0)
@@ -455,13 +453,13 @@ function getLineChart(e) {
             .attr("y", y(maxPoint))
             .attr("width", w)
             .attr("height", y(28) - y(maxPoint))
-            .style("fill", '#d62728')
+            .style("fill", '#d62728');
     };
 
     var line = d3.line()
         .curve(d3.curveMonotoneY)
         .x(function (d) { return x(d.x); })
-        .y(function (d) { return y(d.y); })
+        .y(function (d) { return y(d.y); });
 
 
     g.append("g")
@@ -565,7 +563,7 @@ var basetiles = L.tileLayer(
 });
 
 var mymap = L.map('mapid', { layers: [basetiles, layerGroup] })
-    .setView([40.7128, -74.0060], 14)
+    .setView([40.7128, -74.0060], 14);
 
 mymap.on('resize moveend zoomend', mapMove);
 d3.select('#filterOn').on('keyup', filtered);

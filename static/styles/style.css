@@ -39,7 +39,7 @@ table {
   overflow-y: auto;
   max-height: 559px;
 }
-#gradeTableDiv {
+#gradeTable {
   max-height: 200px;
   overflow-y: auto;
   padding-left: 0;
@@ -67,13 +67,17 @@ rect {
 }
 .leaflet-popup-content-wrapper {
   text-align: center;
+  width: 650px;
   height: 260px;
 }
 .leaflet-popup-content {
-  width: auto !important;
+  margin: 0 !important;
+  padding: 6px;
+  height: 100%;
+  width:100% !important;;
 }
 
-#inspectionDiv {
+#inspections {
   position: absolute;
   text-align: center;
   height: fit-content;
@@ -84,11 +88,6 @@ rect {
   border-radius: 8px;
   color: black;
   z-index: 1001;
-}
-
-#tooltipDiv {
-  text-align: center;
-  padding: 2px;
 }
 
 .col-4 {
