@@ -15,13 +15,13 @@ def home():
 def refresh():
 
 	filterText = request.form.get("filterOn").upper().strip()
-	#print(filterText)
+
 	client = Socrata("data.cityofnewyork.us",config.access_token)
 	results = client.get("43nn-pn8j", 
 					select="dba, camis,latitude,longitude,building,street,boro,inspection_date,violation_code,coalesce(grade,''),coalesce(score,-1) as score",
 					where="upper(dba) like '%" + filterText + "%' AND coalesce(latitude,0) != 0 AND coalesce(longitude,0) != 0 and coalesce(violation_code,'') != '' ",
-					order="camis,inspection_date DESC ,violation_code ASC",
-					limit = 2000)
+					order="camis, inspection_date DESC ,violation_code ASC",
+					limit = 25000)
 
 	groups = []
 	camis = set()
@@ -64,7 +64,8 @@ def refresh():
 
 			camis.add(key1[1])
 
+	
 	return jsonify(groups)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

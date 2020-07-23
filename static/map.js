@@ -98,6 +98,7 @@ function frmsubmit() {
     request.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             filteredData = JSON.parse(request.responseText);
+            filteredData = filteredData.sort((a, b) => a.DBA.localeCompare(b.DBA))
             filteredData.forEach(function (d, i) {
                 var c = L.marker([d.Latitude, d.Longitude], { title: d.DBA, DBA: d.DBA, CAMIS: d.CAMIS, LATITUDE: d.Latitude, LONGITUDE: d.Longitude, GRADES: d['GRADE HISTORY'] })
                     .bindPopup(getPopUp, { autoPanPaddingTopLeft: [32.5, 100] })
@@ -124,7 +125,7 @@ function getPopUp(e) {
         .text(e.options.DBA)
         .attr("text-anchor", "middle");
 
-    var divRow = div.append("div").attr("class", "row") //.style("height","500px");
+    var divRow = div.append("div").attr("class", "row") 
     var divLine = divRow.append("div").attr("class", "col-4")
     divLine.node().appendChild(getLineChart(e));
     var divPie = divRow.append("div").attr("class", "col-4").attr("id", "pieDiv");

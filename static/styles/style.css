@@ -1,56 +1,113 @@
-#mapid { height: 600px; width: 100%; margin: 0 auto;
-    padding: 0; float: right;}
-    
-  html,body {
-    height: 100%;
-    background-color: #333;
-  }
-  body {box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);}
-  td {font-size: 10px }
-  th {font-size: 11px }
-  table {width: 100%}
-  
-  .container {max-width: 1500px}
-  .input-group{padding-bottom: 5px;}
-  
-  #filterOn, .input-group-text {height: 36px}
-  #tablediv {overflow-y: auto;  max-height:559px;}
-  #gradeTableDiv {max-height: 200px; overflow-y:auto;padding-left: 0; padding-top: 10px;}
-  #filteredList { cursor:pointer;}
-  .pieLabel {text-anchor: middle; fill: white; font-size: 1.0rem; pointer-events: none}
-  hr {
-      display: block;
-      height: 1px;
-      border: 0;
-      border-top: 1px solid #ccc;
-      margin: 1em 0;
-      padding: 0;
-  }
-  rect {opacity: .15}
-  .leaflet-popup-content-wrapper {text-align: center; height: 260px}
-  .leaflet-popup-content {width: auto !important;}
-  
-  #inspectionDiv {position: absolute; 
-        text-align: center; 
-        height: fit-content;  
-        padding: 2px; 
-        font: 12px sans-serif;  
-        background: white;  
-        border: 0px;		  
-        border-radius: 8px;
-        color:black;
-        z-index: 1001;	
-      }
-      
-  #tooltipDiv{
-        text-align: center; 
-        padding: 2px;	
-      }
-      
-  .col-4 {padding-left: 0px; padding-right: 0px}
-  .axisA > .tick {color: #2ca02c}
-  .axisA > g > line {stroke: #2ca02c}
-  
-  .axisB > .tick {color: #ff7f0e}
-  .axisB > g > line {stroke: #ff7f0e}
-  .leaflet-control-attribution {background-color: black !important}
+#mapid {
+  height: 600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  float: right;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: #333;
+}
+body {
+  box-shadow: inset 0 0 5rem rgba(0, 0, 0, 0.5);
+}
+td {
+  font-size: 10px;
+}
+th {
+  font-size: 11px;
+}
+table {
+  width: 100%;
+}
+
+.container {
+  max-width: 1500px;
+}
+.input-group {
+  padding-bottom: 5px;
+}
+
+#filterOn,
+.input-group-text {
+  height: 36px;
+}
+#tablediv {
+  overflow-y: auto;
+  max-height: 559px;
+}
+#gradeTableDiv {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-left: 0;
+  padding-top: 10px;
+}
+#filteredList {
+  cursor: pointer;
+}
+.pieLabel {
+  text-anchor: middle;
+  fill: white;
+  font-size: 1rem;
+  pointer-events: none;
+}
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+rect {
+  opacity: 0.15;
+}
+.leaflet-popup-content-wrapper {
+  text-align: center;
+  height: 260px;
+}
+.leaflet-popup-content {
+  width: auto !important;
+}
+
+#inspectionDiv {
+  position: absolute;
+  text-align: center;
+  height: fit-content;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: white;
+  border: 0px;
+  border-radius: 8px;
+  color: black;
+  z-index: 1001;
+}
+
+#tooltipDiv {
+  text-align: center;
+  padding: 2px;
+}
+
+.col-4 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.axisA > .tick {
+  color: #2ca02c;
+}
+.axisA > g > line {
+  stroke: #2ca02c;
+}
+
+.axisB > .tick {
+  color: #ff7f0e;
+}
+.axisB > g > line {
+  stroke: #ff7f0e;
+}
+.leaflet-control-attribution {
+  background-color: black !important;
+}
